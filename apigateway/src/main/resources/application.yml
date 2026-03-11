@@ -1,0 +1,66 @@
+
+# eks 배포시 apigateway 는 eureka server을 등록하지 않겠다는 의미
+eureka:
+  client:
+    enabled: false
+
+
+spring:
+  application:
+    name: api-gateway
+
+  cloud:
+    gateway:
+    #   # cors 처리
+    #   # 각 서비스 모듈은 웹브라우저와 직접 통신하지 않으므로 단일 진입점인 gateway  ekaekd
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: 
+            - 'http://locahost:3000'
+            allowedMethods: '*'
+            allowedHeaders: '*'
+            exposedHeaders: '*'
+            allowCredentials: true
+
+      # eureka server 에 등록된 client 찾아서 사용자의 url pattern을 매핑하는 작업
+      routes:
+        - id: user-service
+          predicates:
+            - Path=/user-service/**
+          filters:
+            # 첫번째 접두어를 제거하라는 의미
+            # browser : http://server.xxxx.shop/user-service/users/signIn
+            # inner : http://server.xxxx.shop/users/signIn
+            - StripPrefix=1
+          # lb - localhost  ,  http - k8s pod
+          uri: lb://user-service
+        
+        - id: product-service
+          predicates: 
+            - Path=/product-service/**
+          filters:
+            # 첫번째 접두어를 제거하라는 의미 
+            # browser : http://server.xxxxx.shop/product-service/product/create
+            # inner   : http://server.xxxxx.shop/product/signIn
+            - StripPrefix=1 
+          uri: lb://product-service
+
+        - id: order-service
+          predicates: 
+            - Path=/order-service/**
+          filters:
+            # 첫번째 접두어를 제거하라는 의미 
+            # browser : http://server.xxxxx.shop/product-service/product/create
+            # inner   : http://server.xxxxx.shop/product/signIn
+            - StripPrefix=1 
+          uri: lb://order-service
+jwt:
+  secret: lg_cns_am_inspire_04_project_secret_key_for_jwt
+
+# # eureka 설정
+## aws에서는 eureka server는 service로 대신 사용
+# eureka: 
+#   client:
+#     serviceUrl: # eureke 서버에 등록
+#       defaultZone: http://localhost:8761/eureka
