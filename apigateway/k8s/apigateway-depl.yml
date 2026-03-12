@@ -29,6 +29,8 @@ spec:
           ports:
           - containerPort: 8888
 
+---
+
 # core service setting
 # core group : pod, service, ConfigMap, Secret, namespace
 apiVersion: v1 
