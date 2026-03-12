@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 
 import com.example.order.domain.dto.ProductResponseDTO;
  
-k8s service 
 @FeignClient(name = "product-service", url="http://product-service")
 // @FeignClient(name = "product-service")
 public interface ProductOpenFeignService {
