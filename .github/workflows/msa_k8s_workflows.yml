@@ -62,7 +62,7 @@ jobs:
           IMAGE_TAG: latest
         # 직접 만든 명령어
         run: | # 파이프라인으로 멀티 명령어
-          docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG -f ./apigateway/Dockerfile .
+          docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG -f ./apigateway/Dockerfile ./apigateway
           docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
       
       # apply
