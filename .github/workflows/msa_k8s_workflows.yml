@@ -51,3 +51,22 @@ jobs:
           kubectl apply -f ./k8s/msa-zookeeper.yml
           kubectl apply -f ./k8s/msa-kafka.yml
           kubectl apply -f ./k8s/msa-redis.yml
+          
+      # ecr에 각각의 image를 만들고 push까지 자동화
+      # apigateway, user, product, order 
+      - name: apigateway image build and push docker image to ecr
+        # 환경변수
+        env:
+          REGISTRY: 447839931800.dkr.ecr.ap-south-1.amazonaws.com
+          REPOSITORY: apigateway
+          IMAGE_TAG: latest
+        # 직접 만든 명령어
+        run: | # 파이프라인으로 멀티 명령어
+          docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG -f ./apigateway/Dockerfile .
+          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+      
+      # apply
+      - name: eks kubectl apigateway apply 
+        run: |
+          kubectl apply -f ./apigateway/k8s/apigateway-depl.yml
+          kubectl rollout restart deployment apigateway-deployment -n lgcns
