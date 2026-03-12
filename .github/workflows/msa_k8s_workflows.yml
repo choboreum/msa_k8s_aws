@@ -86,5 +86,4 @@ jobs:
       # apply
       - name: eks kubectl user apply 
         run: |
-          kubectl apply -f ./user/k8s/user-depl.yml
           kubectl rollout restart deployment user-deployment -n lgcns
