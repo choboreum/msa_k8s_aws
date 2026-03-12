@@ -88,3 +88,21 @@ jobs:
         run: |
           kubectl apply -f ./user/k8s/user-depl.yml
           kubectl rollout restart deployment user-deployment -n lgcns
+          
+      # order 
+      - name: order image build and push docker image to ecr
+        # 환경변수
+        env:
+          REGISTRY: 447839931800.dkr.ecr.ap-south-1.amazonaws.com
+          REPOSITORY: order-service
+          IMAGE_TAG: latest
+        # 직접 만든 명령어
+        run: | # 파이프라인으로 멀티 명령어
+          docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG -f ./order/Dockerfile ./order
+          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+      
+      # apply
+      - name: eks kubectl order apply 
+        run: |
+          kubectl apply -f ./order/k8s/order-depl.yml
+          kubectl rollout restart deployment order-deployment -n lgcns
