@@ -35,3 +35,19 @@ jobs:
           aws-secret-access-key: ${{secrets.AWS_SECRET}}
           aws-region: ap-south-1
       
+      # cluster 환경 구축
+      - name: aws eks cluster update
+        run: aws eks update-kubeconfig --region ap-south-1 --name lgcns-boreum-cluster
+
+      # ecr login
+      - name: aws ecr login
+        uses: aws-actions/amazon-ecr-login@v1
+
+      # 인프라 구축(ingress, kafka, redis, zookeeper, rabbitmq)
+      - name: deploy infra
+        # 직접 만든 명령어
+        run: | # 파이프라인으로 멀티 명령어
+          kubectl apply -f ./k8s/msa-ingress.yml
+          kubectl apply -f ./k8s/msa-zookeeper.yml
+          kubectl apply -f ./k8s/msa-kafka.yml
+          kubectl apply -f ./k8s/msa-redis.yml
