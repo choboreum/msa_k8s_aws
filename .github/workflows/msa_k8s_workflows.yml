@@ -70,3 +70,21 @@ jobs:
         run: |
           kubectl apply -f ./apigateway/k8s/apigateway-depl.yml
           kubectl rollout restart deployment apigateway-deployment -n lgcns
+          
+      # apigateway, user, product, order 
+      - name: user image build and push docker image to ecr
+        # 환경변수
+        env:
+          REGISTRY: 447839931800.dkr.ecr.ap-south-1.amazonaws.com
+          REPOSITORY: user
+          IMAGE_TAG: latest
+        # 직접 만든 명령어
+        run: | # 파이프라인으로 멀티 명령어
+          docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG -f ./user/Dockerfile ./user
+          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+      
+      # apply
+      - name: eks kubectl user apply 
+        run: |
+          kubectl apply -f ./user/k8s/user-depl.yml
+          kubectl rollout restart deployment user-deployment -n lgcns
